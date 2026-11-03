@@ -15,6 +15,10 @@ captures/
 .cxx/
 *.aab
 *.apk
+
+# Keep the release APK required for submission
+!/apk/
+!/apk/app-release.apk
 output-metadata.json
 
 # IntelliJ
