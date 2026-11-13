@@ -1,8 +1,158 @@
 package com.example.autotrack.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.autotrack.ui.components.BottomNavigationBar
 
 @Composable
-fun AppNavigation(modifier: Modifier = Modifier) {
+fun AppNavigation() {
+    val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val showBottomBar = currentRoute in listOf(
+        Screen.Dashboard.route,
+        Screen.Garage.route,
+        Screen.Maintenance.route,
+        Screen.Fuel.route,
+        Screen.Settings.route
+    )
+
+    Scaffold(
+        bottomBar = {
+            if (showBottomBar) {
+                BottomNavigationBar(navController)
+            }
+        }
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = Screen.Dashboard.route,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            composable(Screen.Dashboard.route) {
+                PlaceholderScreen("Dashboard")
+            }
+
+            composable(Screen.Garage.route) {
+                PlaceholderScreen("My Garage")
+            }
+
+            composable(Screen.Maintenance.route) {
+                PlaceholderScreen("Maintenance")
+            }
+
+            composable(Screen.Fuel.route) {
+                PlaceholderScreen("Fuel")
+            }
+
+            composable(Screen.Settings.route) {
+                PlaceholderScreen("Settings")
+            }
+
+            composable(Screen.Login.route) {
+                PlaceholderScreen("Login")
+            }
+
+            composable(Screen.Register.route) {
+                PlaceholderScreen("Register")
+            }
+
+            composable(
+                route = Screen.CarDetails.route,
+                arguments = listOf(
+                    navArgument("carId") {
+                        type = NavType.IntType
+                    }
+                )
+            ) {
+                PlaceholderScreen("Car Details")
+            }
+
+            composable(Screen.AddCar.route) {
+                PlaceholderScreen("Add Car")
+            }
+
+            composable(
+                Screen.EditCar.route,
+                arguments = listOf(
+                    navArgument("carId") {
+                        type = NavType.IntType
+                    }
+                )
+            ) {
+                PlaceholderScreen("Edit Car")
+            }
+
+            composable(Screen.AddFuel.route) {
+                PlaceholderScreen("Add Fuel")
+            }
+
+            composable(
+                Screen.EditFuel.route,
+                arguments = listOf(
+                    navArgument("fuelId") {
+                        type = NavType.IntType
+                    }
+                )
+            ) {
+                PlaceholderScreen("Edit Fuel")
+            }
+
+            composable(Screen.AddMaintenance.route) {
+                PlaceholderScreen("Add Maintenance")
+            }
+
+            composable(
+                Screen.EditMaintenance.route,
+                arguments = listOf(
+                    navArgument("maintenanceId") {
+                        type = NavType.IntType
+                    }
+                )
+            ) {
+                PlaceholderScreen("Edit Maintenance")
+            }
+
+            composable(Screen.AddReminder.route) {
+                PlaceholderScreen("Add Reminder")
+            }
+
+            composable(
+                Screen.EditReminder.route,
+                arguments = listOf(
+                    navArgument("reminderId") {
+                        type = NavType.IntType
+                    }
+                )
+            ) {
+                PlaceholderScreen("Edit Reminder")
+            }
+        }
+    }
+}
+
+@Composable
+private fun PlaceholderScreen(title: String) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text = title)
+    }
 }
