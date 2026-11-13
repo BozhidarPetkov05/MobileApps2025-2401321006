@@ -2,10 +2,18 @@ package com.example.autotrack.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+// Light theme
+val PrimaryLight = Color(0xFF173B65)
+val SecondaryLight = Color(0xFF3478C9)
+val BackgroundLight = Color(0xFFE8F0FA)
+val SurfaceLight = Color(0xFFFFFFFF)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+// Dark theme
+val PrimaryDark = Color(0xFF9CC7F5)
+val SecondaryDark = Color(0xFF85B8F5)
+val BackgroundDark = Color(0xFF121B28)
+val SurfaceDark = Color(0xFF1E2938)
+
+// Common colors
+val ErrorColor = Color(0xFFBA1A1A)
+val SuccessColor = Color(0xFF218653)
