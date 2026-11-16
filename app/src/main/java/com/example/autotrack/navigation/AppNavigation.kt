@@ -1,6 +1,10 @@
 package com.example.autotrack.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -16,6 +20,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.autotrack.ui.components.BottomNavigationBar
+import com.example.autotrack.ui.dashboard.DashboardScreen
 
 @Composable
 fun AppNavigation() {
@@ -32,6 +37,7 @@ fun AppNavigation() {
     )
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             if (showBottomBar) {
                 BottomNavigationBar(navController)
@@ -43,10 +49,14 @@ fun AppNavigation() {
             startDestination = Screen.Dashboard.route,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(innerPadding),
+            enterTransition = { fadeIn(animationSpec = tween(150)) },
+            exitTransition = { fadeOut(animationSpec = tween(150)) },
+            popEnterTransition = { fadeIn(animationSpec = tween(150)) },
+            popExitTransition = { fadeOut(animationSpec = tween(150)) }
         ) {
             composable(Screen.Dashboard.route) {
-                PlaceholderScreen("Dashboard")
+                DashboardScreen()
             }
 
             composable(Screen.Garage.route) {
@@ -89,7 +99,7 @@ fun AppNavigation() {
             }
 
             composable(
-                Screen.EditCar.route,
+                route = Screen.EditCar.route,
                 arguments = listOf(
                     navArgument("carId") {
                         type = NavType.IntType
@@ -104,7 +114,7 @@ fun AppNavigation() {
             }
 
             composable(
-                Screen.EditFuel.route,
+                route = Screen.EditFuel.route,
                 arguments = listOf(
                     navArgument("fuelId") {
                         type = NavType.IntType
@@ -119,7 +129,7 @@ fun AppNavigation() {
             }
 
             composable(
-                Screen.EditMaintenance.route,
+                route = Screen.EditMaintenance.route,
                 arguments = listOf(
                     navArgument("maintenanceId") {
                         type = NavType.IntType
@@ -134,7 +144,7 @@ fun AppNavigation() {
             }
 
             composable(
-                Screen.EditReminder.route,
+                route = Screen.EditReminder.route,
                 arguments = listOf(
                     navArgument("reminderId") {
                         type = NavType.IntType
