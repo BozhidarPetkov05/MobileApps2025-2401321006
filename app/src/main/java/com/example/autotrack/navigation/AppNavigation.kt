@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,6 +26,7 @@ import com.example.autotrack.ui.auth.RegisterScreen
 import com.example.autotrack.ui.components.BottomNavigationBar
 import com.example.autotrack.ui.dashboard.DashboardScreen
 import com.example.autotrack.ui.garage.CarFormScreen
+import com.example.autotrack.ui.garage.GarageScreen
 import com.example.autotrack.ui.settings.SettingsScreen
 import com.example.autotrack.viewmodel.AuthViewModel
 
@@ -73,7 +75,14 @@ fun AppNavigation() {
             }
 
             composable(Screen.Garage.route) {
-                PlaceholderScreen("My Garage")
+                GarageScreen(
+                    onNavigateToAddCar = {
+                        navController.navigate(Screen.AddCar.route)
+                    },
+                    onNavigateToEditCar = { carId ->
+                        navController.navigate(Screen.EditCar.route.replace("{carId}", carId.toString()))
+                    }
+                )
             }
 
             composable(Screen.Maintenance.route) {
@@ -133,7 +142,8 @@ fun AppNavigation() {
 
             composable(Screen.AddCar.route) {
                 CarFormScreen(
-                    onCarAdded = {
+                    carId = null,
+                    onCarSaved = {
                         navController.popBackStack()
                     },
                     onNavigateBack = {
@@ -149,8 +159,17 @@ fun AppNavigation() {
                         type = NavType.IntType
                     }
                 )
-            ) {
-                PlaceholderScreen("Edit Car")
+            ) { backStackEntry: NavBackStackEntry ->
+                val carId = backStackEntry.arguments?.getInt("carId")
+                CarFormScreen(
+                    carId = carId,
+                    onCarSaved = {
+                        navController.popBackStack()
+                    },
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
             }
 
             composable(Screen.AddFuel.route) {
