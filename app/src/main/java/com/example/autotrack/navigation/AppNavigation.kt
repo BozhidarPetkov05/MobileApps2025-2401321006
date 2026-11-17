@@ -24,6 +24,7 @@ import com.example.autotrack.ui.auth.LoginScreen
 import com.example.autotrack.ui.auth.RegisterScreen
 import com.example.autotrack.ui.components.BottomNavigationBar
 import com.example.autotrack.ui.dashboard.DashboardScreen
+import com.example.autotrack.ui.garage.CarFormScreen
 import com.example.autotrack.ui.settings.SettingsScreen
 import com.example.autotrack.viewmodel.AuthViewModel
 
@@ -64,7 +65,11 @@ fun AppNavigation() {
             popExitTransition = { fadeOut(animationSpec = tween(150)) }
         ) {
             composable(Screen.Dashboard.route) {
-                DashboardScreen()
+                DashboardScreen(
+                    onNavigateToAddCar = {
+                        navController.navigate(Screen.AddCar.route)
+                    }
+                )
             }
 
             composable(Screen.Garage.route) {
@@ -127,7 +132,14 @@ fun AppNavigation() {
             }
 
             composable(Screen.AddCar.route) {
-                PlaceholderScreen("Add Car")
+                CarFormScreen(
+                    onCarAdded = {
+                        navController.popBackStack()
+                    },
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
             }
 
             composable(
