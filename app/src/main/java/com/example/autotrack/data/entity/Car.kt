@@ -12,5 +12,8 @@ data class Car(
     val year: Int,
     val licensePlate: String,
     val mileage: Int,
-    val imageUrl: String? = null
+    val imageUrl: String? = null,
+    val fuelType: String = "",
+    val power: String = "",
+    val vin: String = ""
 )

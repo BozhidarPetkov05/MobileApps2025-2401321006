@@ -1,7 +1,9 @@
 package com.example.autotrack.ui.garage
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -23,7 +25,13 @@ fun CarFormScreen(
     var year by remember { mutableStateOf("") }
     var licensePlate by remember { mutableStateOf("") }
     var mileage by remember { mutableStateOf("") }
+    var fuelType by remember { mutableStateOf("Gasoline") }
+    var power by remember { mutableStateOf("") }
+    var vin by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    val fuelTypes = listOf("Gasoline", "Diesel", "Electric", "Hybrid", "LPG", "CNG")
+    var fuelDropdownExpanded by remember { mutableStateOf(false) }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -44,6 +52,7 @@ fun CarFormScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
                     .padding(24.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
@@ -89,6 +98,55 @@ fun CarFormScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
+                // Fuel Type Dropdown Menu
+                ExposedDropdownMenuBox(
+                    expanded = fuelDropdownExpanded,
+                    onExpandedChange = { fuelDropdownExpanded = !fuelDropdownExpanded },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    OutlinedTextField(
+                        value = fuelType,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Fuel Type") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = fuelDropdownExpanded) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor()
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = fuelDropdownExpanded,
+                        onDismissRequest = { fuelDropdownExpanded = false }
+                    ) {
+                        fuelTypes.forEach { fuel ->
+                            DropdownMenuItem(
+                                text = { Text(fuel) },
+                                onClick = {
+                                    fuelType = fuel
+                                    fuelDropdownExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                OutlinedTextField(
+                    value = power,
+                    onValueChange = { power = it },
+                    label = { Text("Power (e.g. 150 HP)") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = vin,
+                    onValueChange = { vin = it },
+                    label = { Text("VIN (Vehicle Identification Number)") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
                 if (errorMessage != null) {
                     Text(
                         text = errorMessage!!,
@@ -97,21 +155,24 @@ fun CarFormScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
                     onClick = {
                         val yearInt = year.toIntOrNull()
                         val mileageInt = mileage.toIntOrNull()
                         if (make.isBlank() || model.isBlank() || yearInt == null || licensePlate.isBlank() || mileageInt == null) {
-                            errorMessage = "Please fill in all fields with valid numbers."
+                            errorMessage = "Please fill in Make, Model, Year, License Plate, and Mileage with valid numbers."
                         } else {
                             val newCar = Car(
                                 make = make.trim(),
                                 model = model.trim(),
                                 year = yearInt,
                                 licensePlate = licensePlate.trim(),
-                                mileage = mileageInt
+                                mileage = mileageInt,
+                                fuelType = fuelType.trim(),
+                                power = power.trim(),
+                                vin = vin.trim()
                             )
                             carViewModel.addCar(newCar) {
                                 onCarAdded()
@@ -124,6 +185,8 @@ fun CarFormScreen(
                 ) {
                     Text("Save Vehicle", style = MaterialTheme.typography.titleMedium)
                 }
+                
+                Spacer(modifier = Modifier.height(24.dp))
             }
         }
     }
