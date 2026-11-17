@@ -1,11 +1,16 @@
 package com.example.autotrack.ui.dashboard
 
+import android.content.Context
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.ConfirmationNumber
@@ -20,10 +25,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.autotrack.viewmodel.CarViewModel
+import java.io.File
+import java.io.FileOutputStream
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,10 +39,22 @@ fun DashboardScreen(
     onNavigateToAddCar: () -> Unit,
     carViewModel: CarViewModel = viewModel()
 ) {
+    val context = LocalContext.current
     val cars by carViewModel.cars.collectAsState()
     val selectedCar by carViewModel.selectedCar.collectAsState()
 
     var expanded by remember { mutableStateOf(false) }
+
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            val savedPath = saveImageToInternalStorage(context, it)
+            if (savedPath != null && selectedCar != null) {
+                carViewModel.updateCar(selectedCar!!.copy(imageUrl = savedPath))
+            }
+        }
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -170,7 +190,7 @@ fun DashboardScreen(
                                     Icon(
                                         imageVector = Icons.Default.DirectionsCar,
                                         contentDescription = null,
-                                        modifier = Modifier.size(72.dp),
+                                        modifier = Modifier.size(64.dp),
                                         tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                     )
                                     Spacer(modifier = Modifier.height(8.dp))
@@ -179,6 +199,18 @@ fun DashboardScreen(
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                    OutlinedButton(
+                                        onClick = { photoPickerLauncher.launch("image/*") }
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.AddAPhoto,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text("Add Photo")
+                                    }
                                 }
                             }
                         }
@@ -262,7 +294,7 @@ fun DashboardScreen(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                     Text(
-                                        text = car.licensePlate.ifBlank { "N/A" },
+                                        text = car.licensePlate,
                                         style = MaterialTheme.typography.titleLarge
                                     )
                                 }
@@ -397,7 +429,7 @@ fun DashboardScreen(
                                 Spacer(modifier = Modifier.width(16.dp))
                                 Column {
                                     Text(
-                                        text = "VIN (Vehicle Identification Number)",
+                                        text = "VIN (Vehicle IdentificationNumber)",
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -414,5 +446,22 @@ fun DashboardScreen(
                 }
             }
         }
+    }
+}
+
+private fun saveImageToInternalStorage(context: Context, uri: Uri): String? {
+    return try {
+        val inputStream = context.contentResolver.openInputStream(uri) ?: return null
+        val file = File(context.filesDir, "car_${System.currentTimeMillis()}.jpg")
+        val outputStream = FileOutputStream(file)
+        inputStream.use { input ->
+            outputStream.use { output ->
+                input.copyTo(output)
+            }
+        }
+        file.absolutePath
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
     }
 }
