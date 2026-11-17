@@ -13,18 +13,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.autotrack.ui.auth.LoginScreen
+import com.example.autotrack.ui.auth.RegisterScreen
 import com.example.autotrack.ui.components.BottomNavigationBar
 import com.example.autotrack.ui.dashboard.DashboardScreen
+import com.example.autotrack.ui.settings.SettingsScreen
+import com.example.autotrack.viewmodel.AuthViewModel
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
+    val authViewModel: AuthViewModel = viewModel()
+    val startDestination = if (authViewModel.currentUser == null) Screen.Login.route else Screen.Dashboard.route
+
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -46,7 +54,7 @@ fun AppNavigation() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Dashboard.route,
+            startDestination = startDestination,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
@@ -72,15 +80,39 @@ fun AppNavigation() {
             }
 
             composable(Screen.Settings.route) {
-                PlaceholderScreen("Settings")
+                SettingsScreen(
+                    onLogout = {
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(Screen.Login.route)
+                        }
+                    }
+                )
             }
 
             composable(Screen.Login.route) {
-                PlaceholderScreen("Login")
+                LoginScreen(
+                    onLoginSuccess = {
+                        navController.navigate(Screen.Dashboard.route) {
+                            popUpTo(Screen.Login.route)
+                        }
+                    },
+                    onNavigateToRegister = {
+                        navController.navigate(Screen.Register.route)
+                    }
+                )
             }
 
             composable(Screen.Register.route) {
-                PlaceholderScreen("Register")
+                RegisterScreen(
+                    onRegisterSuccess = {
+                        navController.navigate(Screen.Dashboard.route) {
+                            popUpTo(Screen.Login.route)
+                        }
+                    },
+                    onNavigateToLogin = {
+                        navController.popBackStack()
+                    }
+                )
             }
 
             composable(
