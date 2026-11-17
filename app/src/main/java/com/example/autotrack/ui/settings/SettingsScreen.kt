@@ -47,7 +47,8 @@ fun SettingsScreen(
                     authViewModel.logout(onLogout)
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer
                 ),
                 modifier = Modifier.fillMaxWidth()
             ) {

@@ -28,7 +28,20 @@ class AuthViewModel(private val authRepository: AuthRepository = AuthRepository(
                 authRepository.login(email, pass)
                 onSuccess()
             } catch (e: Exception) {
-                _errorMessage.value = e.localizedMessage ?: "Login failed"
+                val message = e.localizedMessage ?: ""
+                _errorMessage.value = when {
+                    message.contains("password", ignoreCase = true) || 
+                    message.contains("credential", ignoreCase = true) || 
+                    message.contains("no user", ignoreCase = true) ||
+                    message.contains("user-not-found", ignoreCase = true) ||
+                    message.contains("invalid-credential", ignoreCase = true) -> 
+                        "Invalid email or password."
+                    message.contains("format", ignoreCase = true) || 
+                    message.contains("address", ignoreCase = true) ||
+                    message.contains("invalid-email", ignoreCase = true) -> 
+                        "Please enter a valid email address."
+                    else -> "Login failed. Please check your details."
+                }
             } finally {
                 _isLoading.value = false
             }
@@ -43,7 +56,20 @@ class AuthViewModel(private val authRepository: AuthRepository = AuthRepository(
                 authRepository.register(email, pass)
                 onSuccess()
             } catch (e: Exception) {
-                _errorMessage.value = e.localizedMessage ?: "Registration failed"
+                val message = e.localizedMessage ?: ""
+                _errorMessage.value = when {
+                    message.contains("password", ignoreCase = true) || 
+                    message.contains("weak-password", ignoreCase = true) -> 
+                        "Password should be at least 6 characters."
+                    message.contains("already in use", ignoreCase = true) || 
+                    message.contains("email-already-in-use", ignoreCase = true) -> 
+                        "Email is already registered."
+                    message.contains("format", ignoreCase = true) || 
+                    message.contains("address", ignoreCase = true) ||
+                    message.contains("invalid-email", ignoreCase = true) -> 
+                        "Please enter a valid email address."
+                    else -> "Registration failed. Please try again."
+                }
             } finally {
                 _isLoading.value = false
             }

@@ -16,4 +16,7 @@ val SurfaceDark = Color(0xFF1E2938)
 
 // Common colors
 val ErrorColor = Color(0xFFBA1A1A)
+val ErrorContainerLight = Color(0xFFFFDAD6)
+val ErrorDark = Color(0xFFFFB4AB)
+val ErrorContainerDark = Color(0xFF93000A)
 val SuccessColor = Color(0xFF218653)
