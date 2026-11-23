@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -226,7 +227,7 @@ fun MaintenanceScreen(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Notifications,
-                                           contentDescription = null,
+                                        contentDescription = null,
                                         modifier = Modifier.size(72.dp),
                                         tint = MaterialTheme.colorScheme.primary
                                     )
@@ -244,17 +245,23 @@ fun MaintenanceScreen(
                                 }
                             }
                         } else {
+                            val sortedReminders = reminders.sortedBy { it.dueDate }
                             LazyColumn(
                                 modifier = Modifier.fillMaxSize(),
                                 contentPadding = PaddingValues(16.dp),
                                 verticalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
-                                items(reminders) { reminder ->
+                                items(sortedReminders) { reminder ->
                                     Card(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .clickable { onNavigateToEditReminder(reminder.id) },
-                                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = if (reminder.isCompleted)
+                                                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                                            else
+                                                MaterialTheme.colorScheme.surface
+                                        ),
                                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                                         shape = RoundedCornerShape(16.dp)
                                     ) {
@@ -265,23 +272,61 @@ fun MaintenanceScreen(
                                             horizontalArrangement = Arrangement.SpaceBetween,
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Icon(
-                                                    imageVector = Icons.Default.Notifications,
-                                                    contentDescription = null,
-                                                    tint = MaterialTheme.colorScheme.primary
-                                                )
-                                                Spacer(modifier = Modifier.width(12.dp))
-                                                Column {
+                                            Row(
+                                                modifier = Modifier.weight(1f),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Surface(
+                                                    color = if (reminder.isCompleted) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.primaryContainer,
+                                                    shape = RoundedCornerShape(12.dp)
+                                                ) {
+                                                    Icon(
+                                                        imageVector = if (reminder.isCompleted) Icons.Default.CheckCircle else Icons.Default.Notifications,
+                                                        contentDescription = null,
+                                                        modifier = Modifier
+                                                            .padding(12.dp)
+                                                            .size(24.dp),
+                                                        tint = if (reminder.isCompleted) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.primary
+                                                    )
+                                                }
+                                                Spacer(modifier = Modifier.width(16.dp))
+                                                Column(
+                                                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                                                ) {
                                                     Text(
                                                         text = reminder.title,
                                                         style = MaterialTheme.typography.titleMedium,
-                                                        color = MaterialTheme.colorScheme.onSurface
+                                                        color = if (reminder.isCompleted) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface
                                                     )
+                                                    Row(
+                                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                                        verticalAlignment = Alignment.CenterVertically
+                                                    ) {
+                                                        Text(
+                                                            text = "Due: ${dateFormat.format(Date(reminder.dueDate))}",
+                                                            style = MaterialTheme.typography.bodyMedium,
+                                                            color = MaterialTheme.colorScheme.secondary
+                                                        )
+                                                        if (reminder.dueMileage != null && reminder.dueMileage > 0) {
+                                                            Text(
+                                                                text = "• ${reminder.dueMileage} km",
+                                                                style = MaterialTheme.typography.bodySmall,
+                                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                            )
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            if (reminder.isCompleted) {
+                                                Surface(
+                                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                                    shape = RoundedCornerShape(8.dp)
+                                                ) {
                                                     Text(
-                                                        text = "Due: ${dateFormat.format(Date(reminder.dueDate))}",
-                                                        style = MaterialTheme.typography.bodyMedium,
-                                                        color = MaterialTheme.colorScheme.secondary
+                                                        text = "Done",
+                                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                                        style = MaterialTheme.typography.labelSmall,
+                                                        color = MaterialTheme.colorScheme.onPrimaryContainer
                                                     )
                                                 }
                                             }
