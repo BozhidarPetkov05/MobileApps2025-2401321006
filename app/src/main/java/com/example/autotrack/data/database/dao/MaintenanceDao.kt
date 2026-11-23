@@ -14,6 +14,9 @@ interface MaintenanceDao {
     @Query("SELECT * FROM maintenance_records WHERE carId = :carId ORDER BY date DESC")
     fun getMaintenanceForCar(carId: Int): Flow<List<Maintenance>>
 
+    @Query("SELECT * FROM maintenance_records WHERE carId = :carId")
+    suspend fun getMaintenanceList(carId: Int): List<Maintenance>
+
     @Query("SELECT * FROM maintenance_records WHERE id = :id")
     suspend fun getMaintenanceById(id: Int): Maintenance?
 

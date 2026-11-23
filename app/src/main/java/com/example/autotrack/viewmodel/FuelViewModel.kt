@@ -34,9 +34,25 @@ class FuelViewModel(application: Application) : AndroidViewModel(application) {
         return fuelRepository.getFuelRecordById(id)
     }
 
+    private suspend fun updateCarMileageIfNeeded(carId: Int) {
+        val car = database.carDao().getCarById(carId) ?: return
+        val fuelRecords = database.fuelRecordDao().getFuelRecordsList(carId)
+        val maintenanceRecords = database.maintenanceDao().getMaintenanceList(carId)
+
+        val maxFuelOdom = fuelRecords.maxOfOrNull { it.odometer } ?: 0
+        val maxMaintOdom = maintenanceRecords.maxOfOrNull { it.odometer } ?: 0
+        val highestOdom = maxOf(car.mileage, maxFuelOdom, maxMaintOdom)
+
+        if (highestOdom > car.mileage) {
+            val updatedCar = car.copy(mileage = highestOdom)
+            database.carDao().updateCar(updatedCar)
+        }
+    }
+
     fun addFuelRecord(fuelRecord: FuelRecord, onComplete: () -> Unit) {
         viewModelScope.launch {
             fuelRepository.insertFuelRecord(fuelRecord)
+            updateCarMileageIfNeeded(fuelRecord.carId)
             onComplete()
         }
     }
@@ -44,6 +60,7 @@ class FuelViewModel(application: Application) : AndroidViewModel(application) {
     fun updateFuelRecord(fuelRecord: FuelRecord, onComplete: () -> Unit) {
         viewModelScope.launch {
             fuelRepository.updateFuelRecord(fuelRecord)
+            updateCarMileageIfNeeded(fuelRecord.carId)
             onComplete()
         }
     }

@@ -47,9 +47,25 @@ class MaintenanceViewModel(application: Application) : AndroidViewModel(applicat
     suspend fun getMaintenanceById(id: Int): Maintenance? = maintenanceRepository.getMaintenanceById(id)
     suspend fun getReminderById(id: Int): Reminder? = reminderRepository.getReminderById(id)
 
+    private suspend fun updateCarMileageIfNeeded(carId: Int) {
+        val car = database.carDao().getCarById(carId) ?: return
+        val fuelRecords = database.fuelRecordDao().getFuelRecordsList(carId)
+        val maintenanceRecords = database.maintenanceDao().getMaintenanceList(carId)
+
+        val maxFuelOdom = fuelRecords.maxOfOrNull { it.odometer } ?: 0
+        val maxMaintOdom = maintenanceRecords.maxOfOrNull { it.odometer } ?: 0
+        val highestOdom = maxOf(car.mileage, maxFuelOdom, maxMaintOdom)
+
+        if (highestOdom > car.mileage) {
+            val updatedCar = car.copy(mileage = highestOdom)
+            database.carDao().updateCar(updatedCar)
+        }
+    }
+
     fun addMaintenance(maintenance: Maintenance, onComplete: () -> Unit) {
         viewModelScope.launch {
             maintenanceRepository.insertMaintenance(maintenance)
+            updateCarMileageIfNeeded(maintenance.carId)
             onComplete()
         }
     }
@@ -57,6 +73,7 @@ class MaintenanceViewModel(application: Application) : AndroidViewModel(applicat
     fun updateMaintenance(maintenance: Maintenance, onComplete: () -> Unit) {
         viewModelScope.launch {
             maintenanceRepository.updateMaintenance(maintenance)
+            updateCarMileageIfNeeded(maintenance.carId)
             onComplete()
         }
     }
