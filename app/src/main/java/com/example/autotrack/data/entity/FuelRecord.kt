@@ -21,9 +21,9 @@ data class FuelRecord(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val carId: Int,
-    val date: Long,
-    val odometer: Int,
-    val liters: Double,
-    val cost: Double,
-    val fullTank: Boolean = true
+    val date: Long = System.currentTimeMillis(),
+    val liters: Double = 0.0,
+    val fuelType: String = "Gasoline",
+    val price: Double = 0.0,
+    val odometer: Int = 0
 )

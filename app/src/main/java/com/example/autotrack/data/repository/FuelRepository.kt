@@ -9,6 +9,10 @@ class FuelRepository(private val fuelRecordDao: FuelRecordDao) {
         return fuelRecordDao.getFuelRecordsForCar(carId)
     }
 
+    suspend fun getFuelRecordById(id: Int): FuelRecord? {
+        return fuelRecordDao.getFuelRecordById(id)
+    }
+
     suspend fun insertFuelRecord(fuelRecord: FuelRecord) {
         fuelRecordDao.insertFuelRecord(fuelRecord)
     }

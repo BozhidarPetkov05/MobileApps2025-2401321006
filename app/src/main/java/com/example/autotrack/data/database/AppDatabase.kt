@@ -15,7 +15,7 @@ import com.example.autotrack.data.entity.Reminder
 
 @Database(
     entities = [Car::class, FuelRecord::class, Maintenance::class, Reminder::class],
-    version = 2,
+    version = 6,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

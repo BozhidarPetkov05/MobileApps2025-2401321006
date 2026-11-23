@@ -25,6 +25,8 @@ import com.example.autotrack.ui.auth.LoginScreen
 import com.example.autotrack.ui.auth.RegisterScreen
 import com.example.autotrack.ui.components.BottomNavigationBar
 import com.example.autotrack.ui.dashboard.DashboardScreen
+import com.example.autotrack.ui.fuel.FuelFormScreen
+import com.example.autotrack.ui.fuel.FuelScreen
 import com.example.autotrack.ui.garage.CarFormScreen
 import com.example.autotrack.ui.garage.GarageScreen
 import com.example.autotrack.ui.settings.SettingsScreen
@@ -90,7 +92,17 @@ fun AppNavigation() {
             }
 
             composable(Screen.Fuel.route) {
-                PlaceholderScreen("Fuel")
+                FuelScreen(
+                    onNavigateToAddFuel = {
+                        navController.navigate(Screen.AddFuel.route)
+                    },
+                    onNavigateToEditFuel = { fuelId ->
+                        navController.navigate(Screen.EditFuel.route.replace("{fuelId}", fuelId.toString()))
+                    },
+                    onNavigateToAddCar = {
+                        navController.navigate(Screen.AddCar.route)
+                    }
+                )
             }
 
             composable(Screen.Settings.route) {
@@ -173,7 +185,15 @@ fun AppNavigation() {
             }
 
             composable(Screen.AddFuel.route) {
-                PlaceholderScreen("Add Fuel")
+                FuelFormScreen(
+                    fuelId = null,
+                    onFuelSaved = {
+                        navController.popBackStack()
+                    },
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
             }
 
             composable(
@@ -183,8 +203,17 @@ fun AppNavigation() {
                         type = NavType.IntType
                     }
                 )
-            ) {
-                PlaceholderScreen("Edit Fuel")
+            ) { backStackEntry: NavBackStackEntry ->
+                val fuelId = backStackEntry.arguments?.getInt("fuelId")
+                FuelFormScreen(
+                    fuelId = fuelId,
+                    onFuelSaved = {
+                        navController.popBackStack()
+                    },
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
             }
 
             composable(Screen.AddMaintenance.route) {
