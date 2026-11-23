@@ -1,15 +1,20 @@
 package com.example.autotrack.ui.components
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocalGasStation
-import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.autotrack.navigation.Screen
@@ -20,7 +25,7 @@ fun BottomNavigationBar(
 ) {
     val items = listOf(
         Triple(Screen.Dashboard.route, "Dashboard", Icons.Default.Home),
-        Triple(Screen.Garage.route, "My Garage", Icons.Default.DirectionsCar),
+        Triple(Screen.Garage.route, "Garage", Icons.Default.DirectionsCar),
         Triple(Screen.Maintenance.route, "Maintenance", Icons.Default.Build),
         Triple(Screen.Fuel.route, "Fuel", Icons.Default.LocalGasStation),
         Triple(Screen.Settings.route, "Settings", Icons.Default.Settings)
@@ -29,7 +34,10 @@ fun BottomNavigationBar(
     val currentRoute = navController
         .currentBackStackEntryAsState().value?.destination?.route
 
-    NavigationBar {
+    NavigationBar(
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface
+    ) {
         items.forEach { (route, label, icon) ->
             NavigationBarItem(
                 selected = currentRoute == route,
@@ -47,9 +55,15 @@ fun BottomNavigationBar(
                 icon = {
                     Icon(
                         imageVector = icon,
-                        contentDescription = label
+                        contentDescription = label,
+                        modifier = Modifier.size(24.dp)
                     )
-                }
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             )
         }
     }

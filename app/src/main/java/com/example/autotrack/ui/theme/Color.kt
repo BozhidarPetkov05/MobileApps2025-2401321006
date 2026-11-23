@@ -8,11 +8,11 @@ val SecondaryLight = Color(0xFF3478C9)
 val BackgroundLight = Color(0xFFE8F0FA)
 val SurfaceLight = Color(0xFFFFFFFF)
 
-// Dark theme
-val PrimaryDark = Color(0xFF9CC7F5)
-val SecondaryDark = Color(0xFF85B8F5)
-val BackgroundDark = Color(0xFF121B28)
-val SurfaceDark = Color(0xFF1E2938)
+// Dark theme - Deep Charcoal + Crisp Sky Blue Accent
+val PrimaryDark = Color(0xFF38BDF8)
+val SecondaryDark = Color(0xFF7DD3FC)
+val BackgroundDark = Color(0xFF121820)
+val SurfaceDark = Color(0xFF1A222D)
 
 // Common colors
 val ErrorColor = Color(0xFFBA1A1A)
