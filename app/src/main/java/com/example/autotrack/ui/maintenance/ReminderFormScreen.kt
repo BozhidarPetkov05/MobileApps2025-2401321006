@@ -1,11 +1,15 @@
 package com.example.autotrack.ui.maintenance
 
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -30,9 +34,21 @@ fun ReminderFormScreen(
 ) {
     val selectedCarId by maintenanceViewModel.selectedCarId.collectAsState()
 
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { _ -> }
+
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
     var title by remember { mutableStateOf("") }
     var dueMileage by remember { mutableStateOf("") }
     var dueDate by remember { mutableStateOf(System.currentTimeMillis()) }
+    var selectedHour by remember { mutableIntStateOf(9) }
+    var selectedMinute by remember { mutableIntStateOf(0) }
     var isCompleted by remember { mutableStateOf(false) }
 
     var titleError by remember { mutableStateOf<String?>(null) }
@@ -42,7 +58,15 @@ fun ReminderFormScreen(
     var existingRecord by remember { mutableStateOf<Reminder?>(null) }
 
     var showDatePicker by remember { mutableStateOf(false) }
+    var showTimePicker by remember { mutableStateOf(false) }
+
     val datePickerState = rememberDatePickerState(initialSelectedDateMillis = dueDate)
+    val timePickerState = rememberTimePickerState(
+        initialHour = selectedHour,
+        initialMinute = selectedMinute,
+        is24Hour = true
+    )
+
     val dateFormat = remember { SimpleDateFormat("dd MMM yyyy", Locale.getDefault()) }
 
     LaunchedEffect(reminderId) {
@@ -54,6 +78,10 @@ fun ReminderFormScreen(
                 dueMileage = it.dueMileage?.toString().orEmpty()
                 dueDate = it.dueDate
                 isCompleted = it.isCompleted
+
+                val cal = Calendar.getInstance().apply { timeInMillis = it.dueDate }
+                selectedHour = cal.get(Calendar.HOUR_OF_DAY)
+                selectedMinute = cal.get(Calendar.MINUTE)
             }
         }
     }
@@ -132,6 +160,23 @@ fun ReminderFormScreen(
                         .clickable { showDatePicker = true }
                 )
 
+                // Time Picker Field
+                val timeString = String.format(Locale.getDefault(), "%02d:%02d", selectedHour, selectedMinute)
+                OutlinedTextField(
+                    value = timeString,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Due Time") },
+                    trailingIcon = {
+                        IconButton(onClick = { showTimePicker = true }) {
+                            Icon(imageVector = Icons.Default.AccessTime, contentDescription = "Select Time")
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { showTimePicker = true }
+                )
+
                 // Is Completed toggle only on edit screen
                 if (existingRecord != null) {
                     Row(
@@ -167,10 +212,19 @@ fun ReminderFormScreen(
                         } else if (titleError == null && dueMileageError == null) {
                             val mileageInt = dueMileage.toIntOrNull()
 
+                            val calendar = Calendar.getInstance().apply {
+                                timeInMillis = dueDate
+                                set(Calendar.HOUR_OF_DAY, selectedHour)
+                                set(Calendar.MINUTE, selectedMinute)
+                                set(Calendar.SECOND, 0)
+                                set(Calendar.MILLISECOND, 0)
+                            }
+                            val finalDueDate = calendar.timeInMillis
+
                             if (existingRecord != null) {
                                 val updated = existingRecord!!.copy(
                                     title = title.trim(),
-                                    dueDate = dueDate,
+                                    dueDate = finalDueDate,
                                     dueMileage = mileageInt,
                                     isCompleted = isCompleted
                                 )
@@ -181,7 +235,7 @@ fun ReminderFormScreen(
                                 val newRecord = Reminder(
                                     carId = selectedCarId!!,
                                     title = title.trim(),
-                                    dueDate = dueDate,
+                                    dueDate = finalDueDate,
                                     dueMileage = mileageInt,
                                     isCompleted = false
                                 )
@@ -240,5 +294,33 @@ fun ReminderFormScreen(
         ) {
             DatePicker(state = datePickerState)
         }
+    }
+
+    if (showTimePicker) {
+        AlertDialog(
+            onDismissRequest = { showTimePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    selectedHour = timePickerState.hour
+                    selectedMinute = timePickerState.minute
+                    showTimePicker = false
+                }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTimePicker = false }) {
+                    Text("Cancel")
+                }
+            },
+            text = {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    TimePicker(state = timePickerState)
+                }
+            }
+        )
     }
 }

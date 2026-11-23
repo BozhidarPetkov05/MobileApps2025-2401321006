@@ -9,6 +9,7 @@ import com.example.autotrack.data.entity.Reminder
 import com.example.autotrack.data.repository.MaintenanceRepository
 import com.example.autotrack.data.repository.ReminderRepository
 import com.example.autotrack.datastore.PreferencesManager
+import com.example.autotrack.util.ReminderScheduler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -88,6 +89,12 @@ class MaintenanceViewModel(application: Application) : AndroidViewModel(applicat
     fun addReminder(reminder: Reminder, onComplete: () -> Unit) {
         viewModelScope.launch {
             reminderRepository.insertReminder(reminder)
+            ReminderScheduler.scheduleReminder(
+                getApplication(),
+                reminder.hashCode(),
+                reminder.title,
+                reminder.dueDate
+            )
             onComplete()
         }
     }
@@ -95,6 +102,12 @@ class MaintenanceViewModel(application: Application) : AndroidViewModel(applicat
     fun updateReminder(reminder: Reminder, onComplete: () -> Unit) {
         viewModelScope.launch {
             reminderRepository.updateReminder(reminder)
+            ReminderScheduler.scheduleReminder(
+                getApplication(),
+                reminder.hashCode(),
+                reminder.title,
+                reminder.dueDate
+            )
             onComplete()
         }
     }
@@ -102,6 +115,7 @@ class MaintenanceViewModel(application: Application) : AndroidViewModel(applicat
     fun deleteReminder(reminder: Reminder, onComplete: () -> Unit) {
         viewModelScope.launch {
             reminderRepository.deleteReminder(reminder)
+            ReminderScheduler.cancelReminder(getApplication(), reminder.hashCode())
             onComplete()
         }
     }

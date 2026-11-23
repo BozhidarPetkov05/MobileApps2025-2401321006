@@ -104,81 +104,29 @@ fun DashboardScreen(
                                     }
                                 }
                             }
-                        },
-                        colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.surface
-                        ),
-                        windowInsets = TopAppBarDefaults.windowInsets
+                        }
                     )
                 }
-            }
 
-            if (cars.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(24.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.DirectionsCar,
-                            contentDescription = null,
-                            modifier = Modifier.size(80.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "No Vehicles Added",
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "Add your first car to start tracking.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(32.dp))
-
-                        Button(
-                            onClick = onNavigateToAddCar,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary
-                            )
-                        ) {
-                            Text("Add Vehicle", style = MaterialTheme.typography.titleMedium)
-                        }
-                    }
-                }
-            } else {
-                selectedCar?.let { car ->
+                if (selectedCar != null) {
+                    val car = selectedCar!!
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
                             .verticalScroll(rememberScrollState())
-                            .padding(20.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        // Car Image Display at Top of Screen
+                        // Vehicle Hero Photo Banner
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(220.dp)
-                                .clip(RoundedCornerShape(20.dp))
+                                .height(240.dp)
                                 .background(MaterialTheme.colorScheme.surfaceVariant),
                             contentAlignment = Alignment.Center
                         ) {
                             if (!car.imageUrl.isNullOrBlank()) {
                                 AsyncImage(
                                     model = car.imageUrl,
-                                    contentDescription = "${car.make} ${car.model}",
+                                    contentDescription = "${car.make} ${car.model} Photo",
                                     modifier = Modifier.fillMaxSize(),
                                     contentScale = ContentScale.Crop
                                 )
@@ -190,262 +138,174 @@ fun DashboardScreen(
                                     Icon(
                                         imageVector = Icons.Default.DirectionsCar,
                                         contentDescription = null,
-                                        modifier = Modifier.size(64.dp),
+                                        modifier = Modifier.size(72.dp),
                                         tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                     )
                                     Spacer(modifier = Modifier.height(8.dp))
                                     Text(
-                                        text = "No Photo Available",
+                                        text = "No Photo Selected",
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
-                                    Spacer(modifier = Modifier.height(12.dp))
-                                    OutlinedButton(
-                                        onClick = { photoPickerLauncher.launch("image/*") }
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.AddAPhoto,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(16.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(6.dp))
-                                        Text("Add Photo")
-                                    }
                                 }
                             }
-                        }
 
-                        // Make & Model Card (Single big prominent field)
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surface
-                            ),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
-                            shape = RoundedCornerShape(16.dp)
-                        ) {
-                            Column(
+                            // Photo Picker Floating Button
+                            IconButton(
+                                onClick = { photoPickerLauncher.launch("image/*") },
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(24.dp)
-                            ) {
-                                Text(
-                                    text = "${car.make} ${car.model}",
-                                    style = MaterialTheme.typography.headlineLarge,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            }
-                        }
-
-                        // Full Screen Information Cards: Year & License Plate
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            Card(
-                                modifier = Modifier.weight(1f),
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                                shape = RoundedCornerShape(16.dp)
-                            ) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.CalendarToday,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary
-                                    )
-                                    Text(
-                                        text = "Year",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                    Text(
-                                        text = "${car.year}",
-                                        style = MaterialTheme.typography.titleLarge
-                                    )
-                                }
-                            }
-
-                            Card(
-                                modifier = Modifier.weight(1f),
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                                shape = RoundedCornerShape(16.dp)
-                            ) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.ConfirmationNumber,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary
-                                    )
-                                    Text(
-                                        text = "License Plate",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                    Text(
-                                        text = car.licensePlate,
-                                        style = MaterialTheme.typography.titleLarge
-                                    )
-                                }
-                            }
-                        }
-
-                        // Full Screen Information Cards: Fuel Type & Power
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            Card(
-                                modifier = Modifier.weight(1f),
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                                shape = RoundedCornerShape(16.dp)
-                            ) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.LocalGasStation,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary
-                                    )
-                                    Text(
-                                        text = "Fuel Type",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                    Text(
-                                        text = car.fuelType.ifBlank { "N/A" },
-                                        style = MaterialTheme.typography.titleMedium
-                                    )
-                                }
-                            }
-
-                            Card(
-                                modifier = Modifier.weight(1f),
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                                shape = RoundedCornerShape(16.dp)
-                            ) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.ElectricBolt,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary
-                                    )
-                                    Text(
-                                        text = "Power",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                    val powerDisplay = when {
-                                        car.power.isBlank() -> "N/A"
-                                        !car.power.contains("hp", ignoreCase = true) && !car.power.contains("kw", ignoreCase = true) -> "${car.power} HP"
-                                        else -> car.power
-                                    }
-                                    Text(
-                                        text = powerDisplay,
-                                        style = MaterialTheme.typography.titleMedium
-                                    )
-                                }
-                            }
-                        }
-
-                        // Mileage Card (Full Width)
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                            shape = RoundedCornerShape(16.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(20.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Default.Speed,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(32.dp),
-                                        tint = MaterialTheme.colorScheme.secondary
-                                    )
-                                    Spacer(modifier = Modifier.width(16.dp))
-                                    Column {
-                                        Text(
-                                            text = "Current Mileage",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                        Text(
-                                            text = "${car.mileage} km",
-                                            style = MaterialTheme.typography.headlineSmall
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        // VIN Card (Full Width)
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                            shape = RoundedCornerShape(16.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(20.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                    .align(Alignment.BottomEnd)
+                                    .padding(16.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.85f))
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.VpnKey,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(32.dp),
-                                    tint = MaterialTheme.colorScheme.secondary
+                                    imageVector = Icons.Default.AddAPhoto,
+                                    contentDescription = "Change Vehicle Photo",
+                                    tint = MaterialTheme.colorScheme.primary
                                 )
-                                Spacer(modifier = Modifier.width(16.dp))
-                                Column {
-                                    Text(
-                                        text = "VIN (Vehicle IdentificationNumber)",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                    Text(
-                                        text = car.vin.ifBlank { "Not Specified" },
-                                        style = MaterialTheme.typography.titleMedium
-                                    )
-                                }
                             }
                         }
 
+                        // Full-screen Vehicle Specifications Section
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(20.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Text(
+                                text = "${car.make} ${car.model}",
+                                style = MaterialTheme.typography.headlineLarge,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surface
+                                ),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                                shape = RoundedCornerShape(16.dp)
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(16.dp),
+                                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                                ) {
+                                    SpecRow(
+                                        icon = Icons.Default.CalendarToday,
+                                        label = "Year",
+                                        value = car.year.toString()
+                                    )
+                                    HorizontalDivider()
+                                    SpecRow(
+                                        icon = Icons.Default.ConfirmationNumber,
+                                        label = "License Plate",
+                                        value = car.licensePlate
+                                    )
+                                    HorizontalDivider()
+                                    SpecRow(
+                                        icon = Icons.Default.Speed,
+                                        label = "Current Mileage",
+                                        value = "${car.mileage} km"
+                                    )
+                                    if (car.fuelType.isNotBlank()) {
+                                        HorizontalDivider()
+                                        SpecRow(
+                                            icon = Icons.Default.LocalGasStation,
+                                            label = "Fuel Type",
+                                            value = car.fuelType
+                                        )
+                                    }
+                                    if (car.power.isNotBlank()) {
+                                        HorizontalDivider()
+                                        SpecRow(
+                                            icon = Icons.Default.ElectricBolt,
+                                            label = "Power",
+                                            value = "${car.power} HP"
+                                        )
+                                    }
+                                    if (car.vin.isNotBlank()) {
+                                        HorizontalDivider()
+                                        SpecRow(
+                                            icon = Icons.Default.VpnKey,
+                                            label = "VIN",
+                                            value = car.vin
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.padding(24.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.DirectionsCar,
+                            contentDescription = null,
+                            modifier = Modifier.size(80.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
                         Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "No Vehicles Found",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Get started by adding your first vehicle to AutoTrack.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Button(onClick = onNavigateToAddCar) {
+                            Text("Add Vehicle")
+                        }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun SpecRow(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    value: String
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Text(
+            text = value,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
     }
 }
 
