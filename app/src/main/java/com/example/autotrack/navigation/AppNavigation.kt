@@ -29,6 +29,9 @@ import com.example.autotrack.ui.fuel.FuelFormScreen
 import com.example.autotrack.ui.fuel.FuelScreen
 import com.example.autotrack.ui.garage.CarFormScreen
 import com.example.autotrack.ui.garage.GarageScreen
+import com.example.autotrack.ui.maintenance.MaintenanceFormScreen
+import com.example.autotrack.ui.maintenance.MaintenanceScreen
+import com.example.autotrack.ui.maintenance.ReminderFormScreen
 import com.example.autotrack.ui.settings.SettingsScreen
 import com.example.autotrack.viewmodel.AuthViewModel
 
@@ -88,7 +91,23 @@ fun AppNavigation() {
             }
 
             composable(Screen.Maintenance.route) {
-                PlaceholderScreen("Maintenance")
+                MaintenanceScreen(
+                    onNavigateToAddMaintenance = {
+                        navController.navigate(Screen.AddMaintenance.route)
+                    },
+                    onNavigateToEditMaintenance = { maintenanceId ->
+                        navController.navigate(Screen.EditMaintenance.route.replace("{maintenanceId}", maintenanceId.toString()))
+                    },
+                    onNavigateToAddReminder = {
+                        navController.navigate(Screen.AddReminder.route)
+                    },
+                    onNavigateToEditReminder = { reminderId ->
+                        navController.navigate(Screen.EditReminder.route.replace("{reminderId}", reminderId.toString()))
+                    },
+                    onNavigateToAddCar = {
+                        navController.navigate(Screen.AddCar.route)
+                    }
+                )
             }
 
             composable(Screen.Fuel.route) {
@@ -217,7 +236,15 @@ fun AppNavigation() {
             }
 
             composable(Screen.AddMaintenance.route) {
-                PlaceholderScreen("Add Maintenance")
+                MaintenanceFormScreen(
+                    maintenanceId = null,
+                    onMaintenanceSaved = {
+                        navController.popBackStack()
+                    },
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
             }
 
             composable(
@@ -227,12 +254,29 @@ fun AppNavigation() {
                         type = NavType.IntType
                     }
                 )
-            ) {
-                PlaceholderScreen("Edit Maintenance")
+            ) { backStackEntry: NavBackStackEntry ->
+                val maintenanceId = backStackEntry.arguments?.getInt("maintenanceId")
+                MaintenanceFormScreen(
+                    maintenanceId = maintenanceId,
+                    onMaintenanceSaved = {
+                        navController.popBackStack()
+                    },
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
             }
 
             composable(Screen.AddReminder.route) {
-                PlaceholderScreen("Add Reminder")
+                ReminderFormScreen(
+                    reminderId = null,
+                    onReminderSaved = {
+                        navController.popBackStack()
+                    },
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
             }
 
             composable(
@@ -242,8 +286,17 @@ fun AppNavigation() {
                         type = NavType.IntType
                     }
                 )
-            ) {
-                PlaceholderScreen("Edit Reminder")
+            ) { backStackEntry: NavBackStackEntry ->
+                val reminderId = backStackEntry.arguments?.getInt("reminderId")
+                ReminderFormScreen(
+                    reminderId = reminderId,
+                    onReminderSaved = {
+                        navController.popBackStack()
+                    },
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
             }
         }
     }

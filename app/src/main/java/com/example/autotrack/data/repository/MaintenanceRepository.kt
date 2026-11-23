@@ -9,6 +9,10 @@ class MaintenanceRepository(private val maintenanceDao: MaintenanceDao) {
         return maintenanceDao.getMaintenanceForCar(carId)
     }
 
+    suspend fun getMaintenanceById(id: Int): Maintenance? {
+        return maintenanceDao.getMaintenanceById(id)
+    }
+
     suspend fun insertMaintenance(maintenance: Maintenance) {
         maintenanceDao.insertMaintenance(maintenance)
     }

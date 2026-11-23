@@ -9,6 +9,10 @@ class ReminderRepository(private val reminderDao: ReminderDao) {
         return reminderDao.getRemindersForCar(carId)
     }
 
+    suspend fun getReminderById(id: Int): Reminder? {
+        return reminderDao.getReminderById(id)
+    }
+
     fun getActiveReminders(): Flow<List<Reminder>> {
         return reminderDao.getActiveReminders()
     }
